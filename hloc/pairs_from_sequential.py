@@ -21,6 +21,7 @@ def main(
     retrieval_path: Optional[Union[Path, str]] = None,
     retrieval_interval: Optional[int] = 2,
     num_loc: Optional[int] = 5,
+    min_retrieval_distance: Optional[int] = 0,
 ) -> None:
     """
     Generate pairs of images based on sequential matching and optional loop closure.
@@ -73,7 +74,7 @@ def main(
             pairs.append((names_q[i], names_q[j]))
 
             if quadratic_overlap:
-                q = 2 ** (j - i)
+                q = 2 ** (j - i) + window_size
                 if q > window_size and i + q < N:
                     pairs.append((names_q[i], names_q[i + q]))
 
@@ -89,23 +90,18 @@ def main(
         match_mask = np.zeros((M, N), dtype=bool)
 
         for i in range(M):
-            for k in range(window_size + 1):
+            mask_range = window_size + 1
+            if quadratic_overlap:
+                mask_range += 2 ** window_size
+
+            if min_retrieval_distance > mask_range:
+                mask_range = min_retrieval_distance
+
+            for k in range(mask_range):
                 if i * retrieval_interval - k >= 0 and i * retrieval_interval - k < N:
                     match_mask[i][i * retrieval_interval - k] = 1
                 if i * retrieval_interval + k >= 0 and i * retrieval_interval + k < N:
                     match_mask[i][i * retrieval_interval + k] = 1
-
-                if quadratic_overlap:
-                    if (
-                        i * retrieval_interval - 2**k >= 0
-                        and i * retrieval_interval - 2**k < N
-                    ):
-                        match_mask[i][i * retrieval_interval - 2**k] = 1
-                    if (
-                        i * retrieval_interval + 2**k >= 0
-                        and i * retrieval_interval + 2**k < N
-                    ):
-                        match_mask[i][i * retrieval_interval + 2**k] = 1
 
         pairs_from_retrieval.main(
             retrieval_path,
