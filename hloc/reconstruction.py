@@ -116,6 +116,7 @@ def main(
     image_list: Optional[List[str]] = None,
     image_options: Optional[Dict[str, Any]] = None,
     mapper_options: Optional[Dict[str, Any]] = None,
+    only_prepare_db: bool = False,
 ) -> pycolmap.Reconstruction:
     assert features.exists(), features
     assert pairs.exists(), pairs
@@ -136,6 +137,12 @@ def main(
         min_match_score,
         skip_geometric_verification,
     )
+
+    if only_prepare_db:
+        logger.info(f"Colmap database saved to: {str(database)}")
+        logger.info("Skipping reconstruction")
+        return None
+
     if not skip_geometric_verification:
         estimation_and_geometric_verification(database, pairs, verbose)
     reconstruction = run_reconstruction(
@@ -182,6 +189,7 @@ if __name__ == "__main__":
             pycolmap.IncrementalMapperOptions().todict()
         ),
     )
+    parser.add_argument("--only_prepare_db", action="store_true", help="Only create the colmap database, skip reconstruction")
     args = parser.parse_args().__dict__
 
     image_options = parse_option_args(
