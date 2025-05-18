@@ -30,9 +30,22 @@ class LighterGlue(BaseModel):
         "descriptors1",
     ]
 
+    compiled = None
+
     def _init(self, conf):
         LightGlue_.default_conf = self.default_conf_xfeat
-        self.net = LightGlue_(None, **conf)
+        print("Initializing lighterglue with conf: ", conf)
+        
+        conf.pop("features")
+
+        if conf.get("compile_network", False):
+            if not LighterGlue.compiled:
+                LighterGlue.compiled = LightGlue_(None, **conf)
+                LighterGlue.compiled = LighterGlue.compiled.eval().cuda()
+                LighterGlue.compiled.compile()
+            self.net = LighterGlue.compiled
+        else:
+            self.net = LightGlue_(None, **conf)
         url = "https://github.com/verlab/accelerated_features/raw/main/weights/xfeat-lighterglue.pt"  # noqa: E501
         state_dict = torch.hub.load_state_dict_from_url(url)
 
