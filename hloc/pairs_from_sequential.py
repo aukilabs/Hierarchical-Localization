@@ -135,12 +135,34 @@ if __name__ == "__main__":
     parser.add_argument("--image_list", type=Path)
     parser.add_argument("--features", type=Path)
     parser.add_argument(
-        "--overlap", type=int, default=10, help="Number of overlapping image pairs"
+        "--window_size", type=int, default=10, help="Number of overlapping image pairs"
     )
     parser.add_argument(
         "--quadratic_overlap",
         action="store_true",
         help="Whether to match images against their quadratic neighbors.",
     )
+    parser.add_argument(
+        "--use_loop_closure",
+        action="store_true",
+        help="Whether to use loop closure for additional matches."
+    )
+    parser.add_argument(
+        "--retrieval_path", type=Path,
+        help="Path to retrieval pairs file for additional matches"
+    )
+    parser.add_argument(
+        "--retrieval_interval", type=int, default=2,
+        help="Interval for retrieval queries"
+    )
+    parser.add_argument(
+        "--num_loc", type=int, default=5,
+        help="Number of top matches to keep from retrieval"
+    )
+    parser.add_argument(
+        "--min_retrieval_distance", type=int, default=0,
+        help="Minimum number of frames in between for loop closure."
+    )
+    
     args = parser.parse_args()
     main(**args.__dict__)
