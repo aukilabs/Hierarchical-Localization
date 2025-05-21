@@ -61,7 +61,11 @@ def pairs_from_score_matrix(
         invalid |= scores < min_score
     scores.masked_fill_(invalid, float("-inf"))
 
-    topk = torch.topk(scores, num_select, dim=1)
+    k = min(num_select, scores.size(1)) # Avoid passing invalid count into topk
+    if k == 0:
+        return []
+
+    topk = torch.topk(scores, k, dim=1)
     indices = topk.indices.cpu().numpy()
     valid = topk.values.isfinite().cpu().numpy()
 
