@@ -157,6 +157,11 @@ confs = {
         "model": {"name": "megaloc"},
         "preprocessing": {"resize_max": 1024},
     },
+    "eigenplaces": {
+        "output": "global-feats-eigenplaces",
+        "model": {"name": "eigenplaces"},
+        "preprocessing": {"resize_max": 1024},
+    },
     "salad": {
         "output": "global-feats-salad",
         "model": {"name": "salad"},
