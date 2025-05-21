@@ -108,7 +108,7 @@ def main(
             retrieval_pairs_tmp,
             num_matched=num_loc,
             match_mask=match_mask,
-            db_list=names_q,
+            db_list=names_q[::retrieval_interval], #names_q,
             query_list=query_list,
         )
 
