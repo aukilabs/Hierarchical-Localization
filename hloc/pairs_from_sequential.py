@@ -87,7 +87,7 @@ def main(
 
         query_list = names_q[::retrieval_interval]
         M = len(query_list)
-        match_mask = np.zeros((M, N), dtype=bool)
+        match_mask = np.zeros((M, M), dtype=bool)
 
         for i in range(M):
             mask_range = window_size + 1
@@ -97,18 +97,19 @@ def main(
             if min_retrieval_distance > mask_range:
                 mask_range = min_retrieval_distance
 
+            mask_range = mask_range // retrieval_interval
             for k in range(mask_range):
-                if i * retrieval_interval - k >= 0 and i * retrieval_interval - k < N:
-                    match_mask[i][i * retrieval_interval - k] = 1
-                if i * retrieval_interval + k >= 0 and i * retrieval_interval + k < N:
-                    match_mask[i][i * retrieval_interval + k] = 1
+                if i - k >= 0 and i - k < N:
+                    match_mask[i][i - k] = 1
+                if i + k >= 0 and i + k < N:
+                    match_mask[i][i + k] = 1
 
         pairs_from_retrieval.main(
             retrieval_path,
             retrieval_pairs_tmp,
             num_matched=num_loc,
             match_mask=match_mask,
-            db_list=names_q[::retrieval_interval], #names_q,
+            db_list=query_list,
             query_list=query_list,
         )
 
