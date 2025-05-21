@@ -99,9 +99,9 @@ def main(
 
             mask_range = mask_range // retrieval_interval
             for k in range(mask_range):
-                if i - k >= 0 and i - k < N:
+                if i - k >= 0 and i - k < M:
                     match_mask[i][i - k] = 1
-                if i + k >= 0 and i + k < N:
+                if i + k >= 0 and i + k < M:
                     match_mask[i][i + k] = 1
 
         pairs_from_retrieval.main(
