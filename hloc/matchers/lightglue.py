@@ -9,7 +9,7 @@ class LightGlue(BaseModel):
         "features": "superpoint",
         "depth_confidence": 0.95,
         "width_confidence": 0.99,
-        "compile_network": True,
+        "compile_network": False,
     }
     required_inputs = [
         "image0",
