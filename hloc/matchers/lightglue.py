@@ -4,10 +4,12 @@ from ..utils.base_model import BaseModel
 
 
 class LightGlue(BaseModel):
+    compiled = None
     default_conf = {
         "features": "superpoint",
         "depth_confidence": 0.95,
         "width_confidence": 0.99,
+        "compile_network": True,
     }
     required_inputs = [
         "image0",
@@ -19,7 +21,14 @@ class LightGlue(BaseModel):
     ]
 
     def _init(self, conf):
-        self.net = LightGlue_(conf.pop("features"), **conf)
+        if conf.get("compile_network", False):
+            if not LightGlue.compiled:
+                LightGlue.compiled = LightGlue_(conf.pop("features"), **conf)
+                LightGlue.compiled = LightGlue.compiled.eval().cuda()
+                LightGlue.compiled.compile()
+            self.net = LightGlue.compiled
+        else:
+            self.net = LightGlue_(conf.pop("features"), **conf)
 
     def _forward(self, data):
         data["descriptors0"] = data["descriptors0"].transpose(-1, -2)
